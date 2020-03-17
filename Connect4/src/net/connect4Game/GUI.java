@@ -31,7 +31,7 @@ public class GUI {
 		
 		this.currentColor = 1;
 		this.gameBoard = gameBoard;
-		enabled = true;
+		this.enabled = true;
 		inputs = new ArrayList<JButton>();
 		boardButtons = new ArrayList<JButton>();
 		
@@ -75,7 +75,7 @@ public class GUI {
 				if(p.getColor() == 0) full = false;
 			}
 			
-			if(full) inputs.get(i).setEnabled(false);
+			if(full) inputs.get(i).setVisible(false);
 		}
 	}
 	
@@ -96,11 +96,12 @@ public class GUI {
 	}
 	
 	public void setInputEnabled(boolean enabled) {
-		this.enabled = enabled;
 		for(JButton button : this.inputs) {
 			button.setVisible(enabled);
 			if(this.currentColor == 2) button.setBackground(Color.RED);
 			else if(this.currentColor == 1) button.setBackground(Color.BLUE);
 		}
+		
+		this.enabled = enabled;
 	}
 }

@@ -11,8 +11,8 @@ public class Game {
 	public Game(boolean player1Human, boolean player2Human) {
 		gameBoard = new Board();
 		gui = new GUI(gameBoard);
-		player1 = new Player(player1Human, 1, gui);
-		player2 = new Player(player2Human, 2, gui);
+		player1 = new Player(player1Human, 1, gui, gameBoard);
+		player2 = new Player(player2Human, 2, gui, gameBoard);
 		
 	}
 	
@@ -29,7 +29,7 @@ public class Game {
 				player2.play(gameBoard);
 				turn *= -1;
 			}
-
+			gameBoard.printBoard();
 			updateGUI(gameBoard.getLastRow(), gameBoard.getLastCol(), gameBoard.getLastColor());
 		}
 		System.out.println("Win reached");
