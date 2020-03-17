@@ -49,6 +49,19 @@ public class Board {
 		return false;
 	}
 	
+	public boolean removePiece(int col) {
+		ArrayList<Piece> column = board.get(col);
+		for(int i = 0; i < column.size(); i++) {
+			if(column.get(i).getColor() != 0) {
+				column.get(i).setColor(0);
+				this.moveCount--;
+			}
+		}
+		
+		
+		return false;
+	}
+	
 	public int checkWin() {
 		//0 - No win, 1 - Blue win, 2 - Red win, -1 - Draw
 		int count = 0;
@@ -98,6 +111,10 @@ public class Board {
 		
 		if(this.moveCount >= 42) return -1;
 		return 0;
+	}
+	
+	public int getScore(int color) {
+		return 1;
 	}
 	
 	void printBoard() {
