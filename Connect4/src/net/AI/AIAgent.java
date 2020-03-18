@@ -40,11 +40,11 @@ public class AIAgent {
 			return new int[] {tmpBoard.getScore(this.color) - tmpBoard.getScore(this.opposingColor), lastCol}; 
 		}
 		
-		
+		int[] moveOrder = new int[]{3, 2, 4, 1, 5, 0, 6};
 		if(maximizingPlayer) {
 			int maxEval = Integer.MIN_VALUE;
 			int maxCol = -1;
-			for(int col = 0; col < 7; col++) {
+			for(int col : moveOrder) {
 				//Try all columns in minimax
 				//Board nextBoard = new Board(tmpBoard);
 				if(tmpBoard.executeMove(this.color, col)) {
@@ -66,7 +66,7 @@ public class AIAgent {
 		} else { //Minimizing player
 			int minEval = Integer.MAX_VALUE;
 			int minCol = -1;
-			for(int col = 0; col < 7; col++) {
+			for(int col : moveOrder) {
 				//Try all columns in minimax
 				//Board nextBoard = new Board(tmpBoard);
 				if(tmpBoard.executeMove(this.opposingColor, col)) {

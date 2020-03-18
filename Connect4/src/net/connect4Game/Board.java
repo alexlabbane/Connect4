@@ -153,6 +153,7 @@ public class Board {
 	}
 	
 	public int getScore(int color) {
+		//TODO: Produce better evaluation function
 		//Count spaces that would complete a connect 4
 		//The lower the row, the higher the score
 
@@ -182,7 +183,7 @@ public class Board {
 				
 				if(connect4Space) {
 					score += (1) * 10;
-					continue;
+					//continue;
 				}
 				
 				//Vertical
@@ -203,7 +204,7 @@ public class Board {
 				
 				if(connect4Space) {
 					score += (1) * 10;
-					continue;
+					//continue;
 				}
 				
 				//Diagonal (top-left to bottom-right)
@@ -226,7 +227,7 @@ public class Board {
 				
 				if(connect4Space) {
 					score += (1) * 10;
-					continue;
+					//continue;
 				}
 				
 				//Diagonal (top-right to bottom-left)
@@ -250,7 +251,7 @@ public class Board {
 				
 				if(connect4Space) {
 					score += (1) * 10;
-					continue;
+					//continue;
 				}
 				
 			}
