@@ -1,20 +1,21 @@
 package net.connect4Game;
 
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class Board {
 	
 	private ArrayList<ArrayList<Piece>> board;
-	private int lastRow;
-	private int lastColumn;
-	private int lastColor;
+	private Stack<Integer> lastRow;
+	private Stack<Integer> lastColumn;
+	private Stack<Integer> lastColor;
 	public int moveCount; //42 max
 	//Transpose of board is stored
 	
 	public Board(Board board) {
-		this.lastRow = board.getLastRow();
-		this.lastColumn = board.getLastCol();
-		this.lastColor = board.getLastColor();
+		//this.lastRow = board.getLastRow();
+		//this.lastColumn = board.getLastCol();
+		//this.lastColor = board.getLastColor();
 		this.moveCount = board.moveCount;
 		
 		ArrayList<ArrayList<Piece>> tmp = board.getBoard();
@@ -30,9 +31,13 @@ public class Board {
 	
 	
 	public Board() {
-		this.lastRow = 0;
-		this.lastColumn = 0;
-		this.lastColor = 0;
+		this.lastRow = new Stack<Integer>();
+		this.lastColumn = new Stack<Integer>();
+		this.lastColor = new Stack<Integer>();
+		this.lastRow.push(0);
+		this.lastColumn.push(0);
+		this.lastColor.push(0);
+		
 		this.moveCount = 0;
 		
 		board = new ArrayList<ArrayList<Piece>>();
@@ -44,9 +49,9 @@ public class Board {
 		}
 	}
 	
-	public int getLastRow() { return this.lastRow; }
-	public int getLastCol() { return this.lastColumn; }
-	public int getLastColor() { return this.lastColor; }
+	public int getLastRow() { return this.lastRow.peek(); }
+	public int getLastCol() { return this.lastColumn.peek(); }
+	public int getLastColor() { return this.lastColor.peek(); }
 	public ArrayList<ArrayList<Piece>> getBoard() { return this.board; }
 	
 	public boolean executeMove(int color, int col) {
@@ -55,9 +60,9 @@ public class Board {
 		for(int i = column.size() - 1; i >= 0; i--) {
 			if(column.get(i).getColor() == 0) {
 				column.get(i).setColor(color);
-				this.lastRow = i;
-				this.lastColumn = col;
-				this.lastColor = color;
+				this.lastRow.push(i);
+				this.lastColumn.push(col);
+				this.lastColor.push(color);
 				this.moveCount++;
 				//System.out.println("COLOR " + color);
 				return true;
@@ -72,6 +77,9 @@ public class Board {
 		for(int i = 0; i < column.size(); i++) {
 			if(column.get(i).getColor() != 0) {
 				column.get(i).setColor(0);
+				this.lastColor.pop();
+				this.lastColumn.pop();
+				this.lastRow.pop();
 				this.moveCount--;
 				return true;
 			}
@@ -87,57 +95,57 @@ public class Board {
 		
 		//Count horizontal
 		for(int i = -3; i <= 3; i++) {
-			int current = this.lastColumn + i;
+			int current = this.lastColumn.peek() + i;
 			if(current >= 0 && current < 7) {
-				if(board.get(current).get(this.lastRow).getColor() == this.lastColor) count++;
+				if(board.get(current).get(this.lastRow.peek()).getColor() == this.lastColor.peek()) count++;
 				else count = 0;
 				
-				if(count >= 4) return this.lastColor;
+				if(count >= 4) return this.lastColor.peek();
 			}
 		}
 		
-		if(count >= 4) return this.lastColor;
+		if(count >= 4) return this.lastColor.peek();
 		count = 0;
 		
 		//Count vertical
 		for(int i = -3; i <= 3; i++) {
-			int current = this.lastRow + i;
+			int current = this.lastRow.peek() + i;
 			if(current >= 0 && current < 6) {
-				if(board.get(this.lastColumn).get(current).getColor() == this.lastColor) count++;
+				if(board.get(this.lastColumn.peek()).get(current).getColor() == this.lastColor.peek()) count++;
 				else count = 0;
 				
-				if(count >= 4) return this.lastColor;
+				if(count >= 4) return this.lastColor.peek();
 			}
 		}
-		if(count >= 4) return this.lastColor;
+		if(count >= 4) return this.lastColor.peek();
 		count = 0;
 		
 		//Check diagonal (top-left to bottom-right)
 		for(int i = -3; i <= 3; i++) {
-			int currentRow = this.lastRow + i;
-			int currentCol = this.lastColumn + i;
+			int currentRow = this.lastRow.peek() + i;
+			int currentCol = this.lastColumn.peek() + i;
 			if(currentRow >= 0 && currentRow < 6 && currentCol >= 0 && currentCol < 7) {
-				if(board.get(currentCol).get(currentRow).getColor() == this.lastColor) count++;
+				if(board.get(currentCol).get(currentRow).getColor() == this.lastColor.peek()) count++;
 				else count = 0;
 				
-				if(count >= 4) return this.lastColor;
+				if(count >= 4) return this.lastColor.peek();
 			}
 		}
-		if(count >= 4) return this.lastColor;
+		if(count >= 4) return this.lastColor.peek();
 		count = 0;
 		
 		//Check diagonal (bottom-left to top-right)
 		for(int i = -3; i <= 3; i++) {
-			int currentRow = this.lastRow - i;
-			int currentCol = this.lastColumn + i;
+			int currentRow = this.lastRow.peek() - i;
+			int currentCol = this.lastColumn.peek() + i;
 			if(currentRow >= 0 && currentRow < 6 && currentCol >= 0 && currentCol < 7) {
-				if(board.get(currentCol).get(currentRow).getColor() == this.lastColor) count++;
+				if(board.get(currentCol).get(currentRow).getColor() == this.lastColor.peek()) count++;
 				else count = 0;
 				
-				if(count >= 4) return this.lastColor;
+				if(count >= 4) return this.lastColor.peek();
 			}
 		}
-		if(count >= 4) return this.lastColor;
+		if(count >= 4) return this.lastColor.peek();
 
 		
 		if(this.moveCount >= 42) return -1;
@@ -173,7 +181,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					score += (i + 1) * 10;
+					score += (1) * 10;
 					continue;
 				}
 				
@@ -194,7 +202,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					score += (i + 1) * 10;
+					score += (1) * 10;
 					continue;
 				}
 				
@@ -217,7 +225,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					score += (i + 1) * 10;
+					score += (1) * 10;
 					continue;
 				}
 				
@@ -241,7 +249,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					score += (i + 1) * 10;
+					score += (1) * 10;
 					continue;
 				}
 				

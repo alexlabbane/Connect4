@@ -9,7 +9,7 @@ public class AIAgent {
 	private Board gameBoard;
 	
 	public AIAgent(Board gameBoard, int depth, int color) {
-		this.depth = 42;
+		this.depth = 9;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
 		else if(this.color == 2) this.opposingColor = 1;
@@ -21,17 +21,23 @@ public class AIAgent {
 		//Scores each gameboard as we go, utilizes backtracking
 		//System.out.println("Call to minimax " + remainingDepth);
 		if(tmpBoard.checkWin() == this.color) {
+			//System.out.println("WINNING BOARD");
+			//tmpBoard.printBoard();
+			//System.out.println("BASE1");
 			return new int[] {100000, lastCol};
 		}
 		if(tmpBoard.checkWin() == this.opposingColor) {
+			//System.out.println("BASE2");
 			return new int[] {-100000, lastCol};
 		}
-		if(tmpBoard.checkWin() == -1) {
+		if(tmpBoard.checkWin() == -1 || tmpBoard.moveCount >= 42) {
+			//System.out.println("BASE3");
 			return new int[] {0, lastCol};
 		}
 		if(remainingDepth <= 0) {
 			//System.out.println("Depth 0: " + (gameBoard.getScore(this.color) - gameBoard.getScore(this.opposingColor)));
-			return new int[] {tmpBoard.getScore(this.color)- tmpBoard.getScore(this.opposingColor), lastCol}; 
+			//System.out.println("BASE4");
+			return new int[] {tmpBoard.getScore(this.color) - tmpBoard.getScore(this.opposingColor), lastCol}; 
 		}
 		
 		
@@ -40,14 +46,15 @@ public class AIAgent {
 			int maxCol = -1;
 			for(int col = 0; col < 7; col++) {
 				//Try all columns in minimax
+				//Board nextBoard = new Board(tmpBoard);
 				if(tmpBoard.executeMove(this.color, col)) {
 					//if(gameBoard.checkWin() != 0) return new int[]{Integer.MAX_VALUE - 1, col};
-					int boardScore = miniMax(false, remainingDepth - 1, alpha, beta, col, new Board(tmpBoard))[0];
+					int boardScore = miniMax(false, remainingDepth - 1, alpha, beta, col, tmpBoard)[0];
 					//System.out.println("MAX OF " + maxEval + " AND " + boardScore);
 					if(boardScore > maxEval) maxCol = col;
 					maxEval = Integer.max(maxEval, boardScore);
 					alpha = Integer.max(alpha, boardScore);
-					//gameBoard.removePiece(col); //Backtracking
+					tmpBoard.removePiece(col); //Backtracking
 					//gameBoard.printBoard();
 					if(beta <= alpha) break;
 				} else {
@@ -61,14 +68,15 @@ public class AIAgent {
 			int minCol = -1;
 			for(int col = 0; col < 7; col++) {
 				//Try all columns in minimax
+				//Board nextBoard = new Board(tmpBoard);
 				if(tmpBoard.executeMove(this.opposingColor, col)) {
 					//if(gameBoard.checkWin() != 0) return new int[]{Integer.MIN_VALUE + 1, col};
-					int boardScore = miniMax(true, remainingDepth - 1, alpha, beta, col, new Board(tmpBoard))[0];
+					int boardScore = miniMax(true, remainingDepth - 1, alpha, beta, col, tmpBoard)[0];
 					//System.out.println("MIN OF " + minEval + " AND " + boardScore);
 					if(boardScore < minEval) minCol = col;
 					minEval = Integer.min(minEval, boardScore);
 					beta = Integer.min(beta,  boardScore);
-					//gameBoard.removePiece(col); //Backtracking
+					tmpBoard.removePiece(col); //Backtracking
 					//gameBoard.printBoard();
 					if(beta <= alpha) break;
 				} else {
@@ -82,15 +90,15 @@ public class AIAgent {
 	}
 	
 	public boolean playMove() {
-		Board newBoard = new Board(this.gameBoard);
-		int[] nextMove = miniMax(true, this.depth, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, newBoard);
+		//Board newBoard = new Board(this.gameBoard);
+		int[] nextMove = miniMax(true, this.depth, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, this.gameBoard);
+		System.out.println("MINIMAX: " + nextMove[0] + " " + nextMove[1]);
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("MINIMAX: " + nextMove[0] + " " + nextMove[1]);
 		return gameBoard.executeMove(this.color, nextMove[1]);
 	}
 	
