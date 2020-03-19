@@ -188,7 +188,7 @@ public class Board {
 				if(connect4Space) {
 					score += (1) * 10;
 					score += (i + 1); //Small bonus for lower rows
-					if(color == evenOdd) score *= 2;
+					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
 					continue;
 				}
 				
@@ -211,7 +211,7 @@ public class Board {
 				if(connect4Space) {
 					score += (1) * 10;
 					score += (i + 1); //Small bonus for lower rows
-					if(color == evenOdd) score *= 2;
+					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
 					continue;
 				}
 				
@@ -236,7 +236,7 @@ public class Board {
 				if(connect4Space) {
 					score += (1) * 10;
 					score += (i + 1); //Small bonus for lower rows
-					if(color == evenOdd) score *= 2;
+					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
 					continue;
 				}
 				
