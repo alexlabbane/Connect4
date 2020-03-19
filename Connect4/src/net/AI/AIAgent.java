@@ -24,11 +24,11 @@ public class AIAgent {
 			//System.out.println("WINNING BOARD");
 			//tmpBoard.printBoard();
 			//System.out.println("BASE1");
-			return new int[] {100000, lastCol};
+			return new int[] {remainingDepth * 100000, lastCol};
 		}
 		if(tmpBoard.checkWin() == this.opposingColor) {
 			//System.out.println("BASE2");
-			return new int[] {-100000, lastCol};
+			return new int[] {remainingDepth * -100000, lastCol};
 		}
 		if(tmpBoard.checkWin() == -1 || tmpBoard.moveCount >= 42) {
 			//System.out.println("BASE3");
@@ -72,6 +72,7 @@ public class AIAgent {
 				if(tmpBoard.executeMove(this.opposingColor, col)) {
 					//if(gameBoard.checkWin() != 0) return new int[]{Integer.MIN_VALUE + 1, col};
 					int boardScore = miniMax(true, remainingDepth - 1, alpha, beta, col, tmpBoard)[0];
+
 					//System.out.println("MIN OF " + minEval + " AND " + boardScore);
 					if(boardScore < minEval) minCol = col;
 					minEval = Integer.min(minEval, boardScore);
@@ -93,12 +94,7 @@ public class AIAgent {
 		//Board newBoard = new Board(this.gameBoard);
 		int[] nextMove = miniMax(true, this.depth, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, this.gameBoard);
 		System.out.println("MINIMAX: " + nextMove[0] + " " + nextMove[1]);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 		return gameBoard.executeMove(this.color, nextMove[1]);
 	}
 	

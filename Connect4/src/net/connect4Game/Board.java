@@ -156,11 +156,15 @@ public class Board {
 		//TODO: Produce better evaluation function
 		//Count spaces that would complete a connect 4
 		//The lower the row, the higher the score
-
+		
+		int evenOdd = 0; //1 if odd; 2 if even
 		int score = 0;
 		int count = 0;
 		
 		for(int i = 0; i < 6; i++) { //row
+			if(i % 2 == 0) evenOdd = 2;
+			else evenOdd = 1;
+			
 			for(int j = 0; j < 7; j++) { //col
 				if(this.board.get(j).get(i).getColor() != 0) continue; //Space already played
 				boolean connect4Space = false;
@@ -183,7 +187,9 @@ public class Board {
 				
 				if(connect4Space) {
 					score += (1) * 10;
-					//continue;
+					score += (i + 1); //Small bonus for lower rows
+					if(color == evenOdd) score *= 2;
+					continue;
 				}
 				
 				//Vertical
@@ -204,7 +210,9 @@ public class Board {
 				
 				if(connect4Space) {
 					score += (1) * 10;
-					//continue;
+					score += (i + 1); //Small bonus for lower rows
+					if(color == evenOdd) score *= 2;
+					continue;
 				}
 				
 				//Diagonal (top-left to bottom-right)
@@ -227,7 +235,9 @@ public class Board {
 				
 				if(connect4Space) {
 					score += (1) * 10;
-					//continue;
+					score += (i + 1); //Small bonus for lower rows
+					if(color == evenOdd) score *= 2;
+					continue;
 				}
 				
 				//Diagonal (top-right to bottom-left)
@@ -251,7 +261,9 @@ public class Board {
 				
 				if(connect4Space) {
 					score += (1) * 10;
-					//continue;
+					score += (i + 1); //Small bonus for lower rows
+					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
+					continue;
 				}
 				
 			}
