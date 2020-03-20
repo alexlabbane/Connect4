@@ -11,12 +11,12 @@ public class Game {
 	public Game(boolean player1Human, boolean player2Human) {
 		gameBoard = new Board();
 		gui = new GUI(gameBoard);
-		player1 = new Player(player1Human, 1, gui, gameBoard);
-		player2 = new Player(player2Human, 2, gui, gameBoard);
+		player1 = new Player(player1Human, 1, gui, gameBoard, 2);
+		player2 = new Player(player2Human, 2, gui, gameBoard, 2);
 		
 	}
 	
-	public void execute() {
+	public int execute() {
 		while(gameBoard.checkWin() == 0) {
 			if(turn == -1) {
 				gui.setInputEnabled(player1.isHuman());
@@ -33,8 +33,10 @@ public class Game {
 			updateGUI(gameBoard.getLastRow(), gameBoard.getLastCol(), gameBoard.getLastColor());
 		}
 		System.out.println("Win reached");
-		//Print winning condition
 		gui.setInputEnabled(false);
+		gui.close();
+		
+		return gameBoard.checkWin();
 	}
 	
 	public void updateGUI(int row, int col, int color) {

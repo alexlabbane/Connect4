@@ -104,4 +104,9 @@ public class GUI {
 		
 		this.enabled = enabled;
 	}
+	
+	public void close() {
+		this.window.setVisible(false);
+		this.gamePanel.setVisible(false);
+	}
 }

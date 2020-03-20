@@ -1,6 +1,7 @@
 package net.connect4Game;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Stack;
 
 public class Board {
@@ -11,24 +12,6 @@ public class Board {
 	private Stack<Integer> lastColor;
 	public int moveCount; //42 max
 	//Transpose of board is stored
-	
-	public Board(Board board) {
-		//this.lastRow = board.getLastRow();
-		//this.lastColumn = board.getLastCol();
-		//this.lastColor = board.getLastColor();
-		this.moveCount = board.moveCount;
-		
-		ArrayList<ArrayList<Piece>> tmp = board.getBoard();
-		this.board = new ArrayList<ArrayList<Piece>>();
-		for(int i = 0; i < 7; i++) {
-			this.board.add(new ArrayList<Piece>());
-			for(int j = 0; j < 6; j++) {
-				Piece newPiece = new Piece(tmp.get(i).get(j).getColor());
-				this.board.get(i).add(newPiece);
-			}
-		}
-	}
-	
 	
 	public Board() {
 		this.lastRow = new Stack<Integer>();
@@ -271,6 +254,277 @@ public class Board {
 		
 		return score;
 	}
+	
+	public int getScore3(int color) {
+		//TODO: Produce better evaluation function
+		//Count spaces that would complete a connect 4
+		//The lower the row, the higher the score
+		
+		int evenOdd = 0; //1 if odd; 2 if even
+		int score = 0;
+		int count = 0;
+		
+		for(int i = 0; i < 6; i++) { //row
+			if(i % 2 == 0) evenOdd = 2;
+			else evenOdd = 1;
+			
+			for(int j = 0; j < 7; j++) { //col
+				if(this.board.get(j).get(i).getColor() != 0) continue; //Space already played
+				boolean connect4Space = false;
+				
+				//Horizontal
+				count = 0;
+				for(int k = -3; k <= 3; k++) {
+					int currentCol = j + k;
+					if(currentCol < 0 || currentCol > 6) continue;
+					
+					if(k == 0) count++;
+					else if(this.board.get(currentCol).get(i).getColor() == color) count++;
+					else count = 0;
+					
+					if(count >= 4) {
+						connect4Space = true;
+						break;
+					}
+				}
+				
+				if(connect4Space) {
+					score += (1) * 10;
+					score += (i + 1); //Small bonus for lower rows
+					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
+					continue;
+				}
+				
+				//Vertical
+				count = 0;
+				for(int k = -3; k <= 3; k++) {
+					int currentRow = i + k;
+					if(currentRow < 0 || currentRow > 5) continue;
+					
+					if(k == 0) count++;
+					else if(this.board.get(j).get(currentRow).getColor() == color) count++;
+					else count = 0;
+					
+					if(count >= 4) {
+						connect4Space = true;
+						break;
+					}
+				}
+				
+				if(connect4Space) { //Vertical threats only worth half as much
+					score += (1) * 10;
+					score += (i + 1); //Small bonus for lower rows
+					//if(color == evenOdd) score *= 0.5 * 2 * (i + 1); //Big bonus for evenOdd & lower rows
+					continue;
+				}
+				
+				//Diagonal (top-left to bottom-right)
+				count = 0;
+				for(int k = -3; k <= 3; k++) {
+					int currentRow = i + k;
+					int currentCol = j + k;
+					if(currentRow < 0 || currentRow > 5) continue;
+					if(currentCol < 0 || currentCol > 6) continue;
+					
+					if(k == 0) count++;
+					else if(this.board.get(currentCol).get(currentRow).getColor() == color) count++;
+					else count = 0;
+					
+					if(count >= 4) {
+						connect4Space = true;
+						break;
+					}
+				}
+				
+				if(connect4Space) {
+					score += (1) * 10;
+					score += (i + 1); //Small bonus for lower rows
+					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
+					continue;
+				}
+				
+				//Diagonal (top-right to bottom-left)
+				count = 0;
+				for(int k = -3; k <= 3; k++) {
+					int currentRow = i - k;
+					int currentCol = j + k;
+					if(currentRow < 0 || currentRow > 5) continue;
+					if(currentCol < 0 || currentCol > 6) continue;
+					
+					if(k == 0) count++;
+					else if(this.board.get(currentCol).get(currentRow).getColor() == color) count++;
+					else count = 0;
+					
+					if(count >= 4) {
+						connect4Space = true;
+						break;
+					}
+					
+				}
+				
+				if(connect4Space) {
+					score += (1) * 10;
+					score += (i + 1); //Small bonus for lower rows
+					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
+					continue;
+				}
+				
+			}
+		}
+		
+		return score;
+	}
+
+	
+	public ArrayList<Integer> getThreats(int color) {
+		//TODO: Produce better evaluation function
+		//Count spaces that would complete a connect 4
+		//The lower the row, the higher the score
+		
+		int evenOdd = 0; //1 if odd; 2 if even
+		ArrayList<Integer> threats = new ArrayList<Integer>();
+		int count = 0;
+		
+		for(int i = 0; i < 6; i++) { //row
+			if(i % 2 == 0) evenOdd = 2;
+			else evenOdd = 1;
+			
+			for(int j = 0; j < 7; j++) { //col
+				if(this.board.get(j).get(i).getColor() != 0) continue; //Space already played
+				boolean connect4Space = false;
+				
+				//Horizontal
+				count = 0;
+				for(int k = -3; k <= 3; k++) {
+					int currentCol = j + k;
+					if(currentCol < 0 || currentCol > 6) continue;
+					
+					if(k == 0) count++;
+					else if(this.board.get(currentCol).get(i).getColor() == color) count++;
+					else count = 0;
+					
+					if(count >= 4) {
+						connect4Space = true;
+						break;
+					}
+				}
+				
+				if(connect4Space) {
+					if(evenOdd == color) threats.add(i); //Add row to threats
+					continue;
+				}
+				
+				//Vertical
+				count = 0;
+				for(int k = -3; k <= 3; k++) {
+					int currentRow = i + k;
+					if(currentRow < 0 || currentRow > 5) continue;
+					
+					if(k == 0) count++;
+					else if(this.board.get(j).get(currentRow).getColor() == color) count++;
+					else count = 0;
+					
+					if(count >= 4) {
+						connect4Space = true;
+						break;
+					}
+				}
+				
+				if(connect4Space) {
+					if(evenOdd == color) threats.add(i); //Add row to threats
+					continue;
+				}
+				
+				//Diagonal (top-left to bottom-right)
+				count = 0;
+				for(int k = -3; k <= 3; k++) {
+					int currentRow = i + k;
+					int currentCol = j + k;
+					if(currentRow < 0 || currentRow > 5) continue;
+					if(currentCol < 0 || currentCol > 6) continue;
+					
+					if(k == 0) count++;
+					else if(this.board.get(currentCol).get(currentRow).getColor() == color) count++;
+					else count = 0;
+					
+					if(count >= 4) {
+						connect4Space = true;
+						break;
+					}
+				}
+				
+				if(connect4Space) {
+					if(evenOdd == color) threats.add(i); //Add row to threats
+					continue;
+				}
+				
+				//Diagonal (top-right to bottom-left)
+				count = 0;
+				for(int k = -3; k <= 3; k++) {
+					int currentRow = i - k;
+					int currentCol = j + k;
+					if(currentRow < 0 || currentRow > 5) continue;
+					if(currentCol < 0 || currentCol > 6) continue;
+					
+					if(k == 0) count++;
+					else if(this.board.get(currentCol).get(currentRow).getColor() == color) count++;
+					else count = 0;
+					
+					if(count >= 4) {
+						connect4Space = true;
+						break;
+					}
+					
+				}
+				
+				if(connect4Space) {
+					if(evenOdd == color) threats.add(i); //Add row to threats
+					continue;
+				}
+				
+			}
+		}
+		
+		return threats;
+	}
+
+	
+	public int getScore2(int color) {
+		int oppColor = 1;
+		if(color == 1) oppColor = 2;
+		
+		//Uses threats
+		//Get points for having threats of correct parity below opponents threats of correct parity
+		int score = 0;
+		ArrayList<Integer> myThreats = getThreats(color); //threats for current player
+		ArrayList<Integer> oppThreats = getThreats(oppColor); //threats for opponent
+		oppThreats.add(-1);
+		
+		
+		oppThreats.sort(Collections.reverseOrder());
+		myThreats.sort(Collections.reverseOrder());
+		
+		double multiplier = 8.0;
+		
+		for(int i = 0; i < myThreats.size(); i++) {
+			if(oppThreats.size() == 0) {
+				score += (10 * myThreats.get(i) * multiplier);
+				continue;
+			}
+			
+			if(myThreats.get(i) > oppThreats.get(0)) {
+				score += (10 * myThreats.get(i) * multiplier);
+			} else {
+				multiplier /= 4.0;
+				oppThreats.remove(0);
+			}
+		}
+		
+		
+		
+		return score;
+	}
+
 	
 	public void printBoard() {
 		//Print board (transpose of the arraylist)

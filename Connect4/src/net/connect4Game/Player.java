@@ -13,12 +13,13 @@ public class Player {
 	private AIAgent ai;
 	private Board gameBoard;
 	
-	public Player(boolean human, int color, GUI gui, Board board) {
+	public Player(boolean human, int color, GUI gui, Board board, int AIType) {
 		this.isHuman = human;
 		this.color = color;
 		this.gui = gui;
 		humanReader = new Scanner(System.in);
-		ai = new AIAgent(board, 15, color);
+		
+		ai = new AIAgent(board, 15, color, AIType);
 		this.gameBoard = board;
 	}
 	

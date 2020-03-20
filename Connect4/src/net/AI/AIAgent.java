@@ -7,13 +7,16 @@ public class AIAgent {
 	private int color;
 	private int opposingColor;
 	private Board gameBoard;
+	private int type;
 	
-	public AIAgent(Board gameBoard, int depth, int color) {
+	public AIAgent(Board gameBoard, int depth, int color, int type) {
 		this.depth = 9;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
 		else if(this.color == 2) this.opposingColor = 1;
 		this.gameBoard = gameBoard;
+		this.type = type;
+		
 	}
 	
 	private int[] miniMax(boolean maximizingPlayer, int remainingDepth, int alpha, int beta, int lastCol, Board tmpBoard) {
@@ -24,10 +27,12 @@ public class AIAgent {
 			//System.out.println("WINNING BOARD");
 			//tmpBoard.printBoard();
 			//System.out.println("BASE1");
+
 			return new int[] {remainingDepth * 100000, lastCol};
 		}
 		if(tmpBoard.checkWin() == this.opposingColor) {
 			//System.out.println("BASE2");
+			
 			return new int[] {remainingDepth * -100000, lastCol};
 		}
 		if(tmpBoard.checkWin() == -1 || tmpBoard.moveCount >= 42) {
@@ -37,10 +42,18 @@ public class AIAgent {
 		if(remainingDepth <= 0) {
 			//System.out.println("Depth 0: " + (gameBoard.getScore(this.color) - gameBoard.getScore(this.opposingColor)));
 			//System.out.println("BASE4");
+			switch(this.type) {
+			case 1:
+				return new int[] {tmpBoard.getScore(this.color) - tmpBoard.getScore(this.opposingColor), lastCol}; 
+			case 2:
+				return new int[] {tmpBoard.getScore2(this.color) - tmpBoard.getScore2(this.opposingColor), lastCol};
+			case 3:
+				return new int[] {tmpBoard.getScore3(this.color)- tmpBoard.getScore3(this.opposingColor), lastCol}; 
+			}
 			return new int[] {tmpBoard.getScore(this.color) - tmpBoard.getScore(this.opposingColor), lastCol}; 
 		}
 		
-		int[] moveOrder = new int[]{3, 2, 4, 1, 5, 0, 6};
+		int[] moveOrder = new int[]{3, 1, 5, 2, 4, 0, 6};
 		if(maximizingPlayer) {
 			int maxEval = Integer.MIN_VALUE;
 			int maxCol = -1;
