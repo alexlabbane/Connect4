@@ -18,11 +18,11 @@ public class Piece {
 	
 	public String toString() {
 		if(this.color == 0) { 
-			return "Null";
+			return "O";
 		} else if(this.color == 1){
-			return "Blue";
+			return "Y";
 		}
 		
-		return "Red ";
+		return "R";
 	}
 }

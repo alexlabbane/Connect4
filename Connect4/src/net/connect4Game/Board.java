@@ -2,7 +2,11 @@ package net.connect4Game;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Random;
 import java.util.Stack;
+
+import net.AI.RandomAIAgent;
 
 public class Board {
 	
@@ -10,7 +14,11 @@ public class Board {
 	private Stack<Integer> lastRow;
 	private Stack<Integer> lastColumn;
 	private Stack<Integer> lastColor;
+	private HashMap<String, Long> redZobrists;
+	private HashMap<String, Long> blueZobrists;
 	public int moveCount; //42 max
+	public long currentZobrist;
+	Random zobristGenerator;
 	//Transpose of board is stored
 	
 	public Board() {
@@ -21,13 +29,20 @@ public class Board {
 		this.lastColumn.push(0);
 		this.lastColor.push(0);
 		
+		this.redZobrists = new HashMap<String, Long>();
+		this.blueZobrists = new HashMap<String, Long>();
+		this.zobristGenerator = new Random();
+		this.currentZobrist = 0;
+		
 		this.moveCount = 0;
 		
 		board = new ArrayList<ArrayList<Piece>>();
-		for(int i = 0; i < 7; i++) {
+		for(int i = 0; i < 7; i++) { //col
 			board.add(new ArrayList<Piece>());
-			for(int j = 0; j < 6; j++) {
+			for(int j = 0; j < 6; j++) { //row
 				board.get(i).add(new Piece(0));
+				redZobrists.put("" + i + j, zobristGenerator.nextLong());
+				blueZobrists.put("" + i + j, zobristGenerator.nextLong());
 			}
 		}
 	}
@@ -47,6 +62,17 @@ public class Board {
 				this.lastColumn.push(col);
 				this.lastColor.push(color);
 				this.moveCount++;
+				
+				//Update board state zobrist key
+				if(color == 1) {
+					this.currentZobrist = this.currentZobrist ^ blueZobrists.get("" + col + i);
+					//System.out.println("Piece Key: " + blueZobrists.get("" + col + i));
+				}
+				else {
+					this.currentZobrist = this.currentZobrist ^ redZobrists.get("" + col + i);
+					//System.out.println("Piece Key: " + redZobrists.get("" + col + i));
+				}
+				//System.out.println("Zobrist key: " + this.currentZobrist);
 				//System.out.println("COLOR " + color);
 				return true;
 			}
@@ -59,11 +85,16 @@ public class Board {
 		ArrayList<Piece> column = board.get(col);
 		for(int i = 0; i < column.size(); i++) {
 			if(column.get(i).getColor() != 0) {
+				//Update board state zobrist key
+				if(this.lastColor.peek() == 1) this.currentZobrist = this.currentZobrist ^ blueZobrists.get("" + col + this.lastRow.peek());
+				else this.currentZobrist = this.currentZobrist ^ redZobrists.get("" + col + this.lastRow.peek());
+				//System.out.println("Zobrist key: " + this.currentZobrist);
 				column.get(i).setColor(0);
 				this.lastColor.pop();
 				this.lastColumn.pop();
 				this.lastRow.pop();
 				this.moveCount--;
+				
 				return true;
 			}
 		}
@@ -169,7 +200,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					score += (1) * 10;
+					score += 10;
 					score += (i + 1); //Small bonus for lower rows
 					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
 					continue;
@@ -192,7 +223,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					score += (1) * 10;
+					score += 10;
 					score += (i + 1); //Small bonus for lower rows
 					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
 					continue;
@@ -217,7 +248,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					score += (1) * 10;
+					score += 10;
 					score += (i + 1); //Small bonus for lower rows
 					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
 					continue;
@@ -243,7 +274,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					score += (1) * 10;
+					score += 10;
 					score += (i + 1); //Small bonus for lower rows
 					if(color == evenOdd) score *= 2 * (i + 1); //Big bonus for evenOdd & lower rows
 					continue;
@@ -253,6 +284,12 @@ public class Board {
 		}
 		
 		return score;
+	}
+	
+	public int getScore4(int color) {
+		RandomAIAgent rai = new RandomAIAgent(color, this, 10);
+		
+		return rai.getScore();
 	}
 	
 	public int getScore3(int color) {
@@ -410,7 +447,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					if(evenOdd == color) threats.add(i); //Add row to threats
+					threats.add(i); //Add row to threats
 					continue;
 				}
 				
@@ -431,7 +468,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					if(evenOdd == color) threats.add(i); //Add row to threats
+					threats.add(i); //Add row to threats
 					continue;
 				}
 				
@@ -454,7 +491,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					if(evenOdd == color) threats.add(i); //Add row to threats
+					threats.add(i); //Add row to threats
 					continue;
 				}
 				
@@ -478,7 +515,7 @@ public class Board {
 				}
 				
 				if(connect4Space) {
-					if(evenOdd == color) threats.add(i); //Add row to threats
+					threats.add(i); //Add row to threats
 					continue;
 				}
 				
@@ -493,6 +530,7 @@ public class Board {
 		int oppColor = 1;
 		if(color == 1) oppColor = 2;
 		
+		int evenOdd = color % 2; //Odd for blue (1), even for red (0)
 		//Uses threats
 		//Get points for having threats of correct parity below opponents threats of correct parity
 		int score = 0;
@@ -504,23 +542,49 @@ public class Board {
 		oppThreats.sort(Collections.reverseOrder());
 		myThreats.sort(Collections.reverseOrder());
 		
-		double multiplier = 8.0;
-		
-		for(int i = 0; i < myThreats.size(); i++) {
-			if(oppThreats.size() == 0) {
-				score += (10 * myThreats.get(i) * multiplier);
-				continue;
-			}
-			
-			if(myThreats.get(i) > oppThreats.get(0)) {
-				score += (10 * myThreats.get(i) * multiplier);
+		int prevThreat = -1;
+		int prevScore = 0;
+		int myBestCertain = -1;
+		for(int i = 0; i < myThreats.size(); i++) { //Score player
+			if(myThreats.get(i) == prevThreat) {
+				if(myBestCertain < myThreats.get(i)) myBestCertain = myThreats.get(i);
+				prevScore *= prevScore;
 			} else {
-				multiplier /= 4.0;
-				oppThreats.remove(0);
+				score += prevScore;
+				
+				if(myThreats.get(i) == prevThreat - 1) {
+					if(myBestCertain < myThreats.get(i)) myBestCertain = myThreats.get(i);
+				}
+				
+				prevThreat = myThreats.get(i);
+				prevScore = myThreats.get(i);
+				if(myThreats.get(i) % 2 == evenOdd) prevScore = (int) Math.pow(myThreats.get(i), myThreats.get(i));
+				
 			}
 		}
 		
+		prevThreat = -1;
+		prevScore = 0;
+		int oppBestCertain = -1;
+		for(int i = 0; i < oppThreats.size(); i++) { //Score opponent
+			if(oppThreats.get(i) == prevThreat) {
+				if(oppBestCertain < oppThreats.get(i)) oppBestCertain = oppThreats.get(i);				
+				prevScore *= 2;
+			} else {
+				score -= prevScore;
+				
+				if(oppThreats.get(i) == prevThreat - 1) {
+					if(oppBestCertain < oppThreats.get(i)) oppBestCertain = oppThreats.get(i);				
+				}
+				
+				prevThreat = oppThreats.get(i);
+				prevScore = oppThreats.get(i);
+				if(oppThreats.get(i) % 2 != evenOdd) prevScore = (int) Math.pow(oppThreats.get(i), oppThreats.get(i));
+				
+			}
+		}
 		
+		if(oppBestCertain > myBestCertain) return -5000000; //Half as bad as loss in 8 moves
 		
 		return score;
 	}
@@ -528,7 +592,7 @@ public class Board {
 	
 	public void printBoard() {
 		//Print board (transpose of the arraylist)
-		System.out.println();
+		System.out.println("Current Board");
 		for(int i = 0; i < 6; i++) {
 			for(int j = 0; j < 7; j++) {
 				System.out.print(board.get(j).get(i).toString() + " ");

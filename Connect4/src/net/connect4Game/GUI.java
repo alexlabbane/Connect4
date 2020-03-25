@@ -45,7 +45,7 @@ public class GUI {
 			    public void actionPerformed(ActionEvent e) {
 			    	GUI.this.gameBoard.executeMove(GUI.this.currentColor, index);
 			    	GUI.this.setInputEnabled(false);
-			    	System.out.println(index);
+			    	System.out.println("Player plays is row " + index);
 			    }
 			});
 			
@@ -63,7 +63,8 @@ public class GUI {
 		}
 		
 		window.getContentPane().add(gamePanel);
-		window.revalidate();
+		//window.revalidate();
+		window.setEnabled(true);
 		window.setVisible(true);
 		
 	}
@@ -109,4 +110,5 @@ public class GUI {
 		this.window.setVisible(false);
 		this.gamePanel.setVisible(false);
 	}
+	
 }
