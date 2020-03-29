@@ -31,7 +31,7 @@ public class Player {
 		
 		this.AIType = AIType;
 		this.rai = new RandomAIAgent(color, board, 10000);
-		this.ai = new AIAgent(board, 8, color, tmpType); //Uses evaluation function 1
+		this.ai = new AIAgent(board, 8, color, tmpType); //Uses evaluation function tmpType
 		this.hai = new HybridAIAgent(board, 8, color);
 		
 		this.gameBoard = board;

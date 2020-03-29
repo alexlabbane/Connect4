@@ -1,5 +1,9 @@
 package net.AI;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -7,6 +11,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import net.connect4Game.Board;
+import net.connect4Game.Piece;
 import util.Pair;
 
 public class AIAgent {
@@ -19,7 +24,7 @@ public class AIAgent {
 	private int[] moveOrder;
 	
 	public AIAgent(Board gameBoard, int depth, int color, int type) {
-		this.depth = depth;
+		this.depth = 8;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
 		else if(this.color == 2) this.opposingColor = 1;
@@ -218,7 +223,7 @@ public class AIAgent {
 			case 1:
 				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore(color) - tmpBoard.getScore(this.opposingColor), lastCol)); 
 			case 2:
-				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore2(color) - tmpBoard.getScore2(this.opposingColor), lastCol)); 
+				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore2(color), lastCol)); 
 			case 3:
 				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore3(color) - tmpBoard.getScore3(this.opposingColor), lastCol)); 
 			case 4:
@@ -289,7 +294,50 @@ public class AIAgent {
 
 	}
 
+	public int getBookMove(BufferedReader boardReader) throws IOException {
+		for(int i = 0; i < 6; i++) { //row
+			String[] row = boardReader.readLine().split(" ");
+			for(int j = 0; j < 7; j++) { //col
+				//Compare pieces; if there is diff, return col
+				Piece bookPiece;
+				//NOT: Blue and red pieces flip depending on who goes first (oops)
+				if(row[j].equals("B") && this.color == 1 || row[j].equals("R") && this.color == 2) {
+					bookPiece = new Piece(2);
+				} else if(row[j].equals("R") && this.color == 1 || row[j].equals("B") && this.color == 2) {
+					bookPiece = new Piece(1);
+				} else {
+					bookPiece = new Piece(0);
+				}
+				
+				if(!bookPiece.toString().equals(this.gameBoard.getBoard().get(j).get(i).toString())) {
+					return j;
+				}
+			}
+		}
+		
+		return -1; //No book move found
+	}
+	
 	public boolean playMove() {
+		String oppMoves = this.gameBoard.getMoveSequence(this.opposingColor);
+		if(this.gameBoard.getMoveSequence(this.color).length() < 4) {
+			//Search for predefined move
+			String dataPath = "C:/Users/scien/git/Connect4/Connect4/bin/net/AI/openingBook/" + this.color;
+			try {
+				//Add move path so we look at correct board
+				for(int i = 0; i < oppMoves.length(); i++) {
+					dataPath += "/" + oppMoves.substring(i, i + 1);
+				}
+				
+				BufferedReader boardReader = new BufferedReader(new FileReader(dataPath + "/board.txt"));
+				System.out.println("Book Move.");
+				int nextMove = getBookMove(boardReader);
+				 if(gameBoard.executeMove(this.color, nextMove)) return true;
+			} catch (IOException e) {
+				System.out.println("Expected Book Move not found at: " + dataPath);
+			}
+		}
+		
 		//Use iterative deepening w/transposition table to improve move ordering and performance for previously seen board states
 		//Board newBoard = new Board(this.gameBoard);
 		List<Pair<Integer, Integer>> nextMoves = null;

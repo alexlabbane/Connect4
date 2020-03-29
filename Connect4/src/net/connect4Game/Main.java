@@ -1,15 +1,22 @@
 package net.connect4Game;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
 
 import javax.swing.JOptionPane;
 
+import net.AI.AIAgent;
 import net.launcher.Launcher;
 
 public class Main {
 	public static void main(String args[]) throws InterruptedException {
+		
+		//test();
 		
 		//Launcher launcher = new Launcher();
 		boolean playAgain = true;
@@ -27,7 +34,7 @@ public class Main {
 			
 			if(type % 2 == 0 || true) {
 				System.out.println("Type 1 Game");
-				game = new Game(playerFirst, Game.AITypes.MINIMAX.getType(), playerFirst, Game.AITypes.MINIMAX.getType());
+				game = new Game(playerFirst, Game.AITypes.MINIMAX.getType(), !playerFirst, Game.AITypes.MINIMAX.getType());
 			} else if(type % 2 == 1) {
 				System.out.println("Type 2 Game");
 				game = new Game(playerFirst, Game.AITypes.RANDOM.getType(), !playerFirst, Game.AITypes.RANDOM.getType());
@@ -56,6 +63,20 @@ public class Main {
 			game.close();
 		}
 
+		System.exit(0);
+	}
+	
+	public static void test() {
+		Board board = new Board();
+		AIAgent blue = new AIAgent(board, 8, 1, Game.AITypes.MINIMAX.getType());
+		try {
+			int move = blue.getBookMove(new BufferedReader(new FileReader("C:/Users/scien/Desktop/Connect Four V2/ConnectFourData/AIFirst/board.txt")));
+			System.out.println(move);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		System.exit(0);
 	}
 }

@@ -17,6 +17,8 @@ public class Board {
 	private HashMap<String, Long> redZobrists;
 	private HashMap<String, Long> blueZobrists;
 	public int moveCount; //42 max
+	private String blueMoveSequence;
+	private String redMoveSequence;
 	public long currentZobrist;
 	Random zobristGenerator;
 	//Transpose of board is stored
@@ -28,6 +30,9 @@ public class Board {
 		this.lastRow.push(0);
 		this.lastColumn.push(0);
 		this.lastColor.push(0);
+		
+		this.blueMoveSequence = "";
+		this.redMoveSequence = "";
 		
 		this.redZobrists = new HashMap<String, Long>();
 		this.blueZobrists = new HashMap<String, Long>();
@@ -50,6 +55,16 @@ public class Board {
 	public int getLastRow() { return this.lastRow.peek(); }
 	public int getLastCol() { return this.lastColumn.peek(); }
 	public int getLastColor() { return this.lastColor.peek(); }
+	public String getMoveSequence(int color) {
+		if(color == 1) {
+			return this.blueMoveSequence;
+		} else if(color == 2) {
+			return this.redMoveSequence;
+		}
+		
+		return "";
+	}
+	
 	public ArrayList<ArrayList<Piece>> getBoard() { return this.board; }
 	
 	public boolean executeMove(int color, int col) {
@@ -63,13 +78,15 @@ public class Board {
 				this.lastColor.push(color);
 				this.moveCount++;
 				
-				//Update board state zobrist key
+				//Update board state zobrist key & move sequences
 				if(color == 1) {
-					this.currentZobrist = this.currentZobrist ^ blueZobrists.get("" + col + i);
+					//this.currentZobrist = this.currentZobrist ^ blueZobrists.get("" + col + i);
+					this.blueMoveSequence += Integer.toString(col);
 					//System.out.println("Piece Key: " + blueZobrists.get("" + col + i));
 				}
 				else {
-					this.currentZobrist = this.currentZobrist ^ redZobrists.get("" + col + i);
+					//this.currentZobrist = this.currentZobrist ^ redZobrists.get("" + col + i);
+					this.redMoveSequence += Integer.toString(col);
 					//System.out.println("Piece Key: " + redZobrists.get("" + col + i));
 				}
 				//System.out.println("Zobrist key: " + this.currentZobrist);
@@ -85,9 +102,16 @@ public class Board {
 		ArrayList<Piece> column = board.get(col);
 		for(int i = 0; i < column.size(); i++) {
 			if(column.get(i).getColor() != 0) {
-				//Update board state zobrist key
-				if(this.lastColor.peek() == 1) this.currentZobrist = this.currentZobrist ^ blueZobrists.get("" + col + this.lastRow.peek());
-				else this.currentZobrist = this.currentZobrist ^ redZobrists.get("" + col + this.lastRow.peek());
+				//Update board state zobrist key & move sequences
+				if(this.lastColor.peek() == 1) {
+					//this.currentZobrist = this.currentZobrist ^ blueZobrists.get("" + col + this.lastRow.peek());
+					this.blueMoveSequence = this.blueMoveSequence.substring(0, this.blueMoveSequence.length() - 1);
+
+				}
+				else {
+					//this.currentZobrist = this.currentZobrist ^ redZobrists.get("" + col + this.lastRow.peek());
+					this.redMoveSequence = this.redMoveSequence.substring(0, this.redMoveSequence.length() - 1);
+				}
 				//System.out.println("Zobrist key: " + this.currentZobrist);
 				column.get(i).setColor(0);
 				this.lastColor.pop();
@@ -548,7 +572,6 @@ public class Board {
 		for(int i = 0; i < myThreats.size(); i++) { //Score player
 			if(myThreats.get(i) == prevThreat) {
 				if(myBestCertain < myThreats.get(i)) myBestCertain = myThreats.get(i);
-				prevScore *= prevScore;
 			} else {
 				score += prevScore;
 				
@@ -569,7 +592,6 @@ public class Board {
 		for(int i = 0; i < oppThreats.size(); i++) { //Score opponent
 			if(oppThreats.get(i) == prevThreat) {
 				if(oppBestCertain < oppThreats.get(i)) oppBestCertain = oppThreats.get(i);				
-				prevScore *= 2;
 			} else {
 				score -= prevScore;
 				
@@ -584,7 +606,8 @@ public class Board {
 			}
 		}
 		
-		if(oppBestCertain > myBestCertain) return -5000000; //Half as bad as loss in 8 moves
+		if(oppBestCertain > myBestCertain) return -500000; //Half as bad as loss in 8 moves
+		else if(myBestCertain > oppBestCertain) return 500000;
 		
 		return score;
 	}
