@@ -196,8 +196,8 @@ public class GA {
 
 				String matchDesc = (i+1) + " vs " + (j+1) + ":\t";
 				if(winner == 1) { this.population[i].addWin(); this.population[j].addLoss(); matchDesc += (i+1); }
-				if(winner == 2) { this.population[i].addLoss(); this.population[j].addWin(); matchDesc += (j+1); }
-				if(winner == 0) { matchDesc += "DRAW"; }
+				else if(winner == 2) { this.population[i].addLoss(); this.population[j].addWin(); matchDesc += (j+1); }
+				else { matchDesc += "DRAW"; }
 				this.generationData.add(matchDesc);
 				
 				
@@ -209,8 +209,8 @@ public class GA {
 
 				matchDesc = (j+1) + " vs " + (i+1) + ":\t";
 				if(winner == 1) { this.population[j].addWin(); this.population[i].addLoss(); matchDesc += (j+1); }
-				if(winner == 2) { this.population[j].addLoss(); this.population[i].addWin(); matchDesc += (i+1); }
-				if(winner == 0) { matchDesc += "DRAW"; }
+				else if(winner == 2) { this.population[j].addLoss(); this.population[i].addWin(); matchDesc += (i+1); }
+				else { matchDesc += "DRAW"; }
 				this.generationData.add(matchDesc);
 				
 				count++;
