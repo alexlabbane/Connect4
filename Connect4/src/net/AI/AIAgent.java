@@ -22,6 +22,7 @@ public class AIAgent {
 	private int type;
 	private TranspositionTable transpositionTable;
 	private int[] moveOrder;
+	private int[] parameterWeights;
 	
 	public AIAgent(Board gameBoard, int depth, int color, int type) {
 		this.depth = 8;
@@ -32,8 +33,28 @@ public class AIAgent {
 		this.type = type;
 		this.transpositionTable = new TranspositionTable();
 		this.moveOrder = new int[]{3, 1, 4, 2, 5, 0, 6};
-		
+		this.parameterWeights = null;
 	}
+	
+	/**
+	 * Used only for genetic algorithm (this.type = 2)
+	 * @param gameBoard
+	 * @param depth
+	 * @param color
+	 */
+	public AIAgent(Board gameBoard, int depth, int color, int[] parameterWeights) {
+		this.depth = 3;
+		this.color = color;
+		if(this.color == 1) this.opposingColor = 2;
+		else if(this.color == 2) this.opposingColor = 1;
+		this.gameBoard = gameBoard;
+		this.type = 2;
+		this.transpositionTable = new TranspositionTable();
+		this.moveOrder = new int[]{3, 1, 4, 2, 5, 0, 6};
+		this.parameterWeights = parameterWeights;
+	}
+	
+	public void setBoard(Board gameBoard) { this.gameBoard = gameBoard; }
 	/* Doesn't work yet :/
 	private List<Pair<Integer, Integer>> miniMaxTransposition(boolean maximizingPlayer, int remainingDepth, int alpha, int beta, int lastCol, Board tmpBoard) {
 		//Returns optimal next move based on the results of minimax
@@ -223,7 +244,13 @@ public class AIAgent {
 			case 1:
 				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore(color) - tmpBoard.getScore(this.opposingColor), lastCol)); 
 			case 2:
-				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore2(color), lastCol)); 
+				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore2(color, this.parameterWeights[0],
+						this.parameterWeights[1], 
+						this.parameterWeights[2], 
+						this.parameterWeights[3], 
+						this.parameterWeights[4], 
+						this.parameterWeights[5]), 
+						lastCol)); //This is the function to be tuned by the genetic algorithm
 			case 3:
 				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore3(color) - tmpBoard.getScore3(this.opposingColor), lastCol)); 
 			case 4:
@@ -330,7 +357,7 @@ public class AIAgent {
 				}
 				
 				BufferedReader boardReader = new BufferedReader(new FileReader(dataPath + "/board.txt"));
-				System.out.println("Book Move.");
+				//System.out.println("Book Move.");
 				int nextMove = getBookMove(boardReader);
 				 if(gameBoard.executeMove(this.color, nextMove)) return true;
 			} catch (IOException e) {
@@ -354,7 +381,7 @@ public class AIAgent {
 		//Scanner wait = new Scanner(System.in);
 		//int t = wait.nextInt();
 		
-		System.out.println("Move Preferences");
+		/*System.out.println("Move Preferences");
 		for(Pair<Integer, Integer> p : nextMoves) {
 			System.out.print(p.first + "\t");
 		}
@@ -365,7 +392,7 @@ public class AIAgent {
 		System.out.println();
 		
 		System.out.println("Minimax Score: " + nextMoves.get(0).first);
-		System.out.println("AI plays in row " + nextMoves.get(0).second);
+		System.out.println("AI plays in row " + nextMoves.get(0).second);*/
 		return gameBoard.executeMove(this.color, nextMoves.get(0).second);
 	}
 	

@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.awt.color.ColorSpace;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -109,6 +110,7 @@ public class GUI {
 	public void close() {
 		this.window.setVisible(false);
 		this.gamePanel.setVisible(false);
+		window.dispose();
 	}
 	
 }

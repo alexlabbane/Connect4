@@ -17,6 +17,7 @@ public class Player {
 	private RandomAIAgent rai;
 	private HybridAIAgent hai;
 	private int AIType;
+	private int[] parameterWeights; //Used for genetic algorithm AI
 	
 	private Board gameBoard;
 	
@@ -35,7 +36,31 @@ public class Player {
 		this.hai = new HybridAIAgent(board, 8, color);
 		
 		this.gameBoard = board;
+		this.parameterWeights = null;
 	}
+	
+	public Player(boolean human, int color, GUI gui, Board board, int AIType, int[] parameterWeights) {
+		this.isHuman = human;
+		this.color = color;
+		if(this.color == 1) this.opposingColor = 2;
+		else this.opposingColor = 1;
+		
+		this.gui = gui;
+		humanReader = new Scanner(System.in);
+		
+		this.AIType = 1;
+		this.rai = null;
+		this.hai = null;
+		this.ai = new AIAgent(board, 8, color, parameterWeights); //Uses evaluation function tmpType
+		
+		this.gameBoard = board;
+		this.parameterWeights = parameterWeights;
+	}
+	
+	
+	public void setGUI(GUI gui) { this.gui = gui; }
+	
+	public void setBoard(Board gameBoard) { this.gameBoard = gameBoard; this.ai.setBoard(gameBoard); }
 	
 	public boolean isHuman() { return this.isHuman; }
 	
@@ -51,7 +76,7 @@ public class Player {
 			System.out.println("Players Score: " + (gameBoard.getScore(this.color) - gameBoard.getScore(this.opposingColor)));
 			return true;
 		} else {
-			System.out.println("The AI is thinking.");
+			//System.out.println("The AI is thinking.");
 			if(this.AIType == Game.AITypes.MINIMAX.getType()) return this.ai.playMove();
 			else if(this.AIType == Game.AITypes.RANDOM.getType()) return this.rai.playMove();
 			else if(this.AIType == Game.AITypes.HYBRID.getType()) return hai.playMove();

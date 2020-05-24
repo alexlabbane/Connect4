@@ -101,7 +101,7 @@ public class Board {
 	public boolean removePiece(int col) {
 		ArrayList<Piece> column = board.get(col);
 		for(int i = 0; i < column.size(); i++) {
-			if(column.get(i).getColor() != 0) {
+			if(column.get(this.lastRow.peek()).getColor() != 0) {
 				//Update board state zobrist key & move sequences
 				if(this.lastColor.peek() == 1) {
 					//this.currentZobrist = this.currentZobrist ^ blueZobrists.get("" + col + this.lastRow.peek());
@@ -113,7 +113,7 @@ public class Board {
 					this.redMoveSequence = this.redMoveSequence.substring(0, this.redMoveSequence.length() - 1);
 				}
 				//System.out.println("Zobrist key: " + this.currentZobrist);
-				column.get(i).setColor(0);
+				column.get(this.lastRow.peek()).setColor(0);
 				this.lastColor.pop();
 				this.lastColumn.pop();
 				this.lastRow.pop();
@@ -437,19 +437,19 @@ public class Board {
 	}
 
 	
-	public ArrayList<Integer> getThreats(int color) {
+	public ArrayList<Integer> getThreats(int color, int sequenceCount) {
 		//TODO: Produce better evaluation function
-		//Count spaces that would complete a connect 4
+		//Count spaces that have at least sequenceCount spaces in a row and are not yet blocked
 		//The lower the row, the higher the score
 		
-		int evenOdd = 0; //1 if odd; 2 if even
 		ArrayList<Integer> threats = new ArrayList<Integer>();
+		for(int i = 0; i < 6; i++) {
+			threats.add(0);
+		}
+		
 		int count = 0;
 		
 		for(int i = 0; i < 6; i++) { //row
-			if(i % 2 == 0) evenOdd = 2;
-			else evenOdd = 1;
-			
 			for(int j = 0; j < 7; j++) { //col
 				if(this.board.get(j).get(i).getColor() != 0) continue; //Space already played
 				boolean connect4Space = false;
@@ -464,14 +464,14 @@ public class Board {
 					else if(this.board.get(currentCol).get(i).getColor() == color) count++;
 					else count = 0;
 					
-					if(count >= 4) {
+					if(count >= sequenceCount + 1) {
 						connect4Space = true;
 						break;
 					}
 				}
 				
 				if(connect4Space) {
-					threats.add(i); //Add row to threats
+					threats.set(i, threats.get(i) + 1); //Add row to threats
 					continue;
 				}
 				
@@ -485,14 +485,14 @@ public class Board {
 					else if(this.board.get(j).get(currentRow).getColor() == color) count++;
 					else count = 0;
 					
-					if(count >= 4) {
+					if(count >= sequenceCount + 1) {
 						connect4Space = true;
 						break;
 					}
 				}
 				
 				if(connect4Space) {
-					threats.add(i); //Add row to threats
+					threats.set(i, threats.get(i) + 1); //Add row to threats
 					continue;
 				}
 				
@@ -550,64 +550,47 @@ public class Board {
 	}
 
 	
-	public int getScore2(int color) {
+	public int getScore2(int color, int oneSeq, int twoSeq, int threeSeq, int oneSeqThreat, int twoSeqThreat, int threeSeqThreat) {
 		int oppColor = 1;
 		if(color == 1) oppColor = 2;
 		
 		int evenOdd = color % 2; //Odd for blue (1), even for red (0)
 		//Uses threats
+		//if(myThreats.get(i) % 2 == evenOdd) prevScore = (int) Math.pow(myThreats.get(i), myThreats.get(i)); <-- used to check if threat is of correct parity
 		//Get points for having threats of correct parity below opponents threats of correct parity
 		int score = 0;
-		ArrayList<Integer> myThreats = getThreats(color); //threats for current player
-		ArrayList<Integer> oppThreats = getThreats(oppColor); //threats for opponent
-		oppThreats.add(-1);
 		
-		
-		oppThreats.sort(Collections.reverseOrder());
-		myThreats.sort(Collections.reverseOrder());
-		
-		int prevThreat = -1;
-		int prevScore = 0;
-		int myBestCertain = -1;
-		for(int i = 0; i < myThreats.size(); i++) { //Score player
-			if(myThreats.get(i) == prevThreat) {
-				if(myBestCertain < myThreats.get(i)) myBestCertain = myThreats.get(i);
-			} else {
-				score += prevScore;
+		for(int sequence = 1; sequence < 4; sequence++) {
+			ArrayList<Integer> myThreats = getThreats(color, sequence); //threats for current player
+			ArrayList<Integer> oppThreats = getThreats(oppColor, sequence); //threats for opponent
+			
+			int threats = 0;
+			int nonThreats = 0;
+			
+			for(int i = 0; i < 6; i++) {
+				if(i % 2 == evenOdd) threats += myThreats.get(i);
+				else nonThreats += myThreats.get(i);
 				
-				if(myThreats.get(i) == prevThreat - 1) {
-					if(myBestCertain < myThreats.get(i)) myBestCertain = myThreats.get(i);
-				}
-				
-				prevThreat = myThreats.get(i);
-				prevScore = myThreats.get(i);
-				if(myThreats.get(i) % 2 == evenOdd) prevScore = (int) Math.pow(myThreats.get(i), myThreats.get(i));
-				
+				if(i % 2 != evenOdd) threats -= oppThreats.get(i);
+				else nonThreats -= oppThreats.get(i);
 			}
-		}
-		
-		prevThreat = -1;
-		prevScore = 0;
-		int oppBestCertain = -1;
-		for(int i = 0; i < oppThreats.size(); i++) { //Score opponent
-			if(oppThreats.get(i) == prevThreat) {
-				if(oppBestCertain < oppThreats.get(i)) oppBestCertain = oppThreats.get(i);				
-			} else {
-				score -= prevScore;
-				
-				if(oppThreats.get(i) == prevThreat - 1) {
-					if(oppBestCertain < oppThreats.get(i)) oppBestCertain = oppThreats.get(i);				
-				}
-				
-				prevThreat = oppThreats.get(i);
-				prevScore = oppThreats.get(i);
-				if(oppThreats.get(i) % 2 != evenOdd) prevScore = (int) Math.pow(oppThreats.get(i), oppThreats.get(i));
-				
+			
+			switch(sequence) {
+			case 1:
+				score += oneSeqThreat * threats;
+				score += oneSeq * nonThreats;
+				break;
+			case 2:
+				score += twoSeqThreat * threats;
+				score += twoSeq * nonThreats;
+				break;
+			case 3:
+				score += threeSeqThreat * threats;
+				score += threeSeq * nonThreats;
+				break;
 			}
+			
 		}
-		
-		if(oppBestCertain > myBestCertain) return -500000; //Half as bad as loss in 8 moves
-		else if(myBestCertain > oppBestCertain) return 500000;
 		
 		return score;
 	}

@@ -12,11 +12,23 @@ import javax.swing.JOptionPane;
 
 import net.AI.AIAgent;
 import net.launcher.Launcher;
+import net.train.Chromosome;
+import net.train.GA;
 
 public class Main {
 	public static void main(String args[]) throws InterruptedException {
 		
 		//test();
+		
+		Chromosome test = new Chromosome();
+		System.out.println(test.toString());
+		test.mutate();
+		//System.out.println();
+		System.out.println(test.toString());
+		GA g = new GA(10, 5);
+		g.train();
+
+		System.exit(0);
 		
 		//Launcher launcher = new Launcher();
 		boolean playAgain = true;
@@ -34,7 +46,14 @@ public class Main {
 			
 			if(type % 2 == 0 || true) {
 				System.out.println("Type 1 Game");
-				game = new Game(playerFirst, Game.AITypes.MINIMAX.getType(), !playerFirst, Game.AITypes.MINIMAX.getType());
+				int[] weights = new int[] {8, 13, 83, 3, 85, 87};
+				
+				Player player1 = new Player(false, 1, null, null, Game.AITypes.MINIMAX.getType(), weights);
+				Player player2 = new Player(false, 2, null, null, Game.AITypes.MINIMAX.getType(), 1);
+
+				
+				game = new Game(player1, player2, true);
+				game.execute();
 			} else if(type % 2 == 1) {
 				System.out.println("Type 2 Game");
 				game = new Game(playerFirst, Game.AITypes.RANDOM.getType(), !playerFirst, Game.AITypes.RANDOM.getType());
