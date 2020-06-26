@@ -26,12 +26,12 @@ public class Game {
 	    }
 	}
 	
-	public Game(boolean player1Human, int player1AIType, boolean player2Human, int player2AIType) {
+	public Game(boolean player1Human, int player1AIType, boolean player2Human, int player2AIType, int depth) {
 		gameBoard = new Board();
 		this.guiEnabled = true;
 		gui = new GUI(gameBoard);
-		player1 = new Player(player1Human, 1, gui, gameBoard, player1AIType, 1);
-		player2 = new Player(player2Human, 2, gui, gameBoard, player2AIType, 1);
+		player1 = new Player(player1Human, 1, gui, gameBoard, player1AIType, 1, depth);
+		player2 = new Player(player2Human, 2, gui, gameBoard, player2AIType, 1, depth);
 	}
 	
 	/**

@@ -21,7 +21,7 @@ public class Player {
 	
 	private Board gameBoard;
 	
-	public Player(boolean human, int color, GUI gui, Board board, int AIType, int tmpType) {
+	public Player(boolean human, int color, GUI gui, Board board, int AIType, int tmpType, int depth) {
 		this.isHuman = human;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
@@ -32,14 +32,14 @@ public class Player {
 		
 		this.AIType = AIType;
 		this.rai = new RandomAIAgent(color, board, 10000);
-		this.ai = new AIAgent(board, 8, color, tmpType); //Uses evaluation function tmpType
-		this.hai = new HybridAIAgent(board, 8, color);
+		this.ai = new AIAgent(board, depth, color, tmpType); //Uses evaluation function tmpType
+		this.hai = new HybridAIAgent(board, depth, color);
 		
 		this.gameBoard = board;
 		this.parameterWeights = null;
 	}
 	
-	public Player(boolean human, int color, GUI gui, Board board, int AIType, int[] parameterWeights) {
+	public Player(boolean human, int color, GUI gui, Board board, int AIType, int[] parameterWeights, int depth) {
 		this.isHuman = human;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
@@ -51,7 +51,7 @@ public class Player {
 		this.AIType = 1;
 		this.rai = null;
 		this.hai = null;
-		this.ai = new AIAgent(board, 8, color, parameterWeights); //Uses evaluation function tmpType
+		this.ai = new AIAgent(board, depth, color, parameterWeights); //Uses evaluation function tmpType
 		
 		this.gameBoard = board;
 		this.parameterWeights = parameterWeights;

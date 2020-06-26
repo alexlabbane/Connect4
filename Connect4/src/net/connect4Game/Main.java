@@ -18,17 +18,9 @@ import net.train.GA;
 public class Main {
 	public static void main(String args[]) throws InterruptedException {
 		
-		//test();
-		
-		Chromosome test = new Chromosome();
-		System.out.println(test.toString());
-		test.mutate();
-		//System.out.println();
-		System.out.println(test.toString());
-		GA g = new GA(10, 5);
-		g.train();
-
-		System.exit(0);
+		GA g = new GA(10, 100);
+		//g.train();
+		//System.exit(0);
 		
 		//Launcher launcher = new Launcher();
 		boolean playAgain = true;
@@ -42,26 +34,18 @@ public class Main {
 			if(selected == null) System.exit(0);;
 			
 			if(selected.toString() == "AI") playerFirst = false;
+			
+			Object difficulty = JOptionPane.showInputDialog(null, "Select AI Difficulty", "Input", 0, null, new Object[] {"1", "2", "3", "4", "5", "6", "7", "8"}, 0);
+			
+			int[] weights = new int[] {1, 8, 5, 16, 21, 70};
+			
+			Player player1 = new Player(playerFirst, 1, null, null, Game.AITypes.MINIMAX.getType(), weights, Integer.parseInt(difficulty.toString()));
+			Player player2 = new Player(!playerFirst, 2, null, null, Game.AITypes.MINIMAX.getType(), 1, Integer.parseInt(difficulty.toString()));
 
 			
-			if(type % 2 == 0 || true) {
-				System.out.println("Type 1 Game");
-				int[] weights = new int[] {8, 13, 83, 3, 85, 87};
-				
-				Player player1 = new Player(false, 1, null, null, Game.AITypes.MINIMAX.getType(), weights);
-				Player player2 = new Player(false, 2, null, null, Game.AITypes.MINIMAX.getType(), 1);
-
-				
-				game = new Game(player1, player2, true);
-				game.execute();
-			} else if(type % 2 == 1) {
-				System.out.println("Type 2 Game");
-				game = new Game(playerFirst, Game.AITypes.RANDOM.getType(), !playerFirst, Game.AITypes.RANDOM.getType());
-			} else if(type % 3 == 2 ) {
-				System.out.println("HYBRID GAME");
-				game = new Game(playerFirst, Game.AITypes.HYBRID.getType(), !playerFirst, Game.AITypes.HYBRID.getType());
-			}
-			
+			game = new Game(player1, player2, true);
+			game.execute();
+		
 			int winner = game.execute();
 			
 			if(winner == 1) {

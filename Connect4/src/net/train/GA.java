@@ -188,8 +188,8 @@ public class GA {
 		for(int i = 0; i < this.populationSize; i++) {
 			for(int j = i + 1; j < this.populationSize; j++) {
 				//System.out.println("Game " + count);
-				Player player1 = new Player(false, 1, null, null, 1, this.population[i].getWeights()); //Create player with weights from population[i]
-				Player player2 = new Player(false, 2, null, null, 1, this.population[j].getWeights()); //Create player with weights from population[j]
+				Player player1 = new Player(false, 1, null, null, 1, this.population[i].getWeights(), 5); //Create player with weights from population[i]
+				Player player2 = new Player(false, 2, null, null, 1, this.population[j].getWeights(), 5); //Create player with weights from population[j]
 				
 				Game game = new Game(player1, player2, false);
 				int winner = game.execute();
@@ -201,8 +201,8 @@ public class GA {
 				this.generationData.add(matchDesc);
 				
 				
-				player1 = new Player(false, 2, null, null, 1, this.population[i].getWeights()); //Swap colors
-				player2 = new Player(false, 1, null, null, 1, this.population[j].getWeights()); //Swap colors
+				player1 = new Player(false, 2, null, null, 1, this.population[i].getWeights(), 5); //Swap colors
+				player2 = new Player(false, 1, null, null, 1, this.population[j].getWeights(), 5); //Swap colors
 				
 				game = new Game(player2, player1, false); //Change who goes first
 				winner = game.execute();

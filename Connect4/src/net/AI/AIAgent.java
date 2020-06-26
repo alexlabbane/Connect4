@@ -25,7 +25,7 @@ public class AIAgent {
 	private int[] parameterWeights;
 	
 	public AIAgent(Board gameBoard, int depth, int color, int type) {
-		this.depth = 8;
+		this.depth = depth;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
 		else if(this.color == 2) this.opposingColor = 1;
@@ -43,7 +43,7 @@ public class AIAgent {
 	 * @param color
 	 */
 	public AIAgent(Board gameBoard, int depth, int color, int[] parameterWeights) {
-		this.depth = 3;
+		this.depth = depth;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
 		else if(this.color == 2) this.opposingColor = 1;
@@ -349,15 +349,15 @@ public class AIAgent {
 		String oppMoves = this.gameBoard.getMoveSequence(this.opposingColor);
 		if(this.gameBoard.getMoveSequence(this.color).length() < 4) {
 			//Search for predefined move
-			String dataPath = "C:/Users/scien/git/Connect4/Connect4/bin/net/AI/openingBook/" + this.color;
+			String dataPath = "./openingBook/" + this.color;
 			try {
 				//Add move path so we look at correct board
 				for(int i = 0; i < oppMoves.length(); i++) {
 					dataPath += "/" + oppMoves.substring(i, i + 1);
 				}
-				
+
 				BufferedReader boardReader = new BufferedReader(new FileReader(dataPath + "/board.txt"));
-				//System.out.println("Book Move.");
+				System.out.println("Book Move.");
 				int nextMove = getBookMove(boardReader);
 				 if(gameBoard.executeMove(this.color, nextMove)) return true;
 			} catch (IOException e) {
