@@ -67,7 +67,8 @@ public class Game {
 				if(player2.play(gameBoard)) turn *= -1;
 			}
 			//gameBoard.printBoard();
-			if(this.guiEnabled) updateGUI(gameBoard.getLastRow(), gameBoard.getLastCol(), gameBoard.getLastColor());
+			if(this.guiEnabled) 
+				updateGUI(gameBoard.getLastRow(), gameBoard.getLastCol(), gameBoard.getLastColor());
 		}
 
 		if(this.guiEnabled) {

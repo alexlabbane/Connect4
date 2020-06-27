@@ -77,10 +77,11 @@ public class Player {
 			return true;
 		} else {
 			//System.out.println("The AI is thinking.");
-			if(this.AIType == Game.AITypes.MINIMAX.getType()) return this.ai.playMove();
-			else if(this.AIType == Game.AITypes.RANDOM.getType()) return this.rai.playMove();
-			else if(this.AIType == Game.AITypes.HYBRID.getType()) return hai.playMove();
-			else return false;
+			boolean movePlayed =  this.ai.playMove();
+			
+			this.gui.setAiInfo(this.ai.getNodesEvaluated(), this.ai.getNodesPruned());
+			
+			return movePlayed;
 		}		
 	}
 }

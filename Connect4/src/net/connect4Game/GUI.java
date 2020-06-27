@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 public class GUI {
@@ -17,6 +18,8 @@ public class GUI {
 	private JPanel gamePanel;
 	private ArrayList<JButton> boardButtons;
 	private ArrayList<JButton> inputs;
+	private JLabel aiInfo;
+	
 	private Board gameBoard;
 	
 	private int currentColor;
@@ -63,6 +66,10 @@ public class GUI {
 			gamePanel.add(newButton);
 		}
 		
+		this.aiInfo = new JLabel("<html>Nodes evaluated: <br>Nodes pruned (estimated): </html>");
+		this.gamePanel.add(aiInfo);
+		this.aiInfo.setBounds(100, 675, 500, 100);
+		
 		window.getContentPane().add(gamePanel);
 		//window.revalidate();
 		window.setEnabled(true);
@@ -79,6 +86,10 @@ public class GUI {
 			
 			if(full) inputs.get(i).setVisible(false);
 		}
+	}
+	
+	public void setAiInfo(long nodesEvaluated, long nodesPruned) {
+		this.aiInfo.setText("<html>Nodes evaluated: " + nodesEvaluated + "<br>Nodes pruned (estimated): " + nodesPruned + "</html>");
 	}
 	
 	public boolean inputIsEnabled() {

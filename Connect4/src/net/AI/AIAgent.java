@@ -23,6 +23,8 @@ public class AIAgent {
 	private TranspositionTable transpositionTable;
 	private int[] moveOrder;
 	private int[] parameterWeights;
+	private long nodesEvaluated;
+	private long nodesPruned;
 	
 	public AIAgent(Board gameBoard, int depth, int color, int type) {
 		this.depth = depth;
@@ -226,6 +228,14 @@ public class AIAgent {
 	}
 	*/
 	
+	public long getNodesEvaluated() {
+		return this.nodesEvaluated;
+	}
+	
+	public long getNodesPruned() {
+		return this.nodesPruned;
+	}
+	
 	private List<Pair<Integer, Integer>> miniMax(boolean maximizingPlayer, int remainingDepth, int alpha, int beta, int lastCol, Board tmpBoard) {
 		//Returns optimal next move based on the results of minimax
 		//Scores each gameboard as we go, utilizes backtracking
@@ -259,6 +269,7 @@ public class AIAgent {
 			return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore(this.color) - tmpBoard.getScore(this.opposingColor), lastCol)); 
 		}
 		
+		this.nodesEvaluated++;
 		if(maximizingPlayer) {
 			List<Pair<Integer, Integer>> toReturn = new ArrayList<Pair<Integer, Integer>>();
 			
@@ -369,6 +380,8 @@ public class AIAgent {
 		//Board newBoard = new Board(this.gameBoard);
 		List<Pair<Integer, Integer>> nextMoves = null;
 		for(int i = 1; i <= this.depth; i++) {
+			this.nodesEvaluated = 0;
+			this.nodesPruned = (long)Math.pow(7, i);
 			nextMoves = miniMax(true, i, Integer.MIN_VALUE, Integer.MAX_VALUE, 0, this.gameBoard);
 			nextMoves.sort(Collections.reverseOrder());
 			
@@ -378,6 +391,8 @@ public class AIAgent {
 				index++;
 			}
 		}
+		
+		this.nodesPruned -= this.nodesEvaluated;
 		//Scanner wait = new Scanner(System.in);
 		//int t = wait.nextInt();
 		

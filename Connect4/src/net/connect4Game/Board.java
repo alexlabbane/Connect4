@@ -21,6 +21,8 @@ public class Board {
 	private String redMoveSequence;
 	public long currentZobrist;
 	Random zobristGenerator;
+	private long nodesEvaluated;
+	private long nodesPruned;
 	//Transpose of board is stored
 	
 	public Board() {
@@ -68,6 +70,7 @@ public class Board {
 	public ArrayList<ArrayList<Piece>> getBoard() { return this.board; }
 	
 	public boolean executeMove(int color, int col) {
+		
 		//Executes move and returns true if valid; false if not valid
 		ArrayList<Piece> column = board.get(col);
 		for(int i = column.size() - 1; i >= 0; i--) {
