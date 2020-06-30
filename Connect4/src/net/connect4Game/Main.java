@@ -4,6 +4,11 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Random;
@@ -16,7 +21,7 @@ import net.train.Chromosome;
 import net.train.GA;
 
 public class Main {
-	public static void main(String args[]) throws InterruptedException {
+	public static void main(String args[]) throws InterruptedException, IOException {
 		
 		GA g = new GA(10, 100);
 		//g.train();
@@ -50,8 +55,19 @@ public class Main {
 			
 			if(winner == 1) {
 				JOptionPane.showMessageDialog(null, "Blue won the game");
+				if(player1.isHuman()) {
+					System.out.println("LOSSES: " + addAILoss());
+				} else {
+					System.out.println("WINS: " + addAIWin());
+				}
+					
 			} else if(winner == 2) {
 				JOptionPane.showMessageDialog(null, "Red won the game.");
+				if(player2.isHuman()) {
+					System.out.println("LOSSES: " + addAILoss());
+				} else {
+					System.out.println("WINS: " + addAIWin());
+				}
 			} else {
 				JOptionPane.showMessageDialog(null, "The game ended in a draw.");
 			}
@@ -81,5 +97,54 @@ public class Main {
 		}
 		
 		System.exit(0);
+	}
+	
+	public static int addAIWin() {
+		int numWins = -1;
+		
+		try {
+			//API documentation at countapi.xyz
+			URL aiWins = new URL("https://api.countapi.xyz/hit/alexlabbane.com/connect4wins");
+			HttpURLConnection con = (HttpURLConnection) aiWins.openConnection();
+			
+	        con.addRequestProperty("User-Agent", "Mozilla");
+			con.setRequestMethod("GET");
+			
+			int status = con.getResponseCode();
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			
+			String response = in.readLine();
+			numWins = Integer.parseInt(response.substring(response.indexOf(':') + 1, response.length() - 1));
+			in.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} //AI Wins
+
+		return numWins;
+	}
+	
+	public static int addAILoss() {
+		int numLosses = -1;
+		try {
+			//API documentation at countapi.xyz
+			URL aiLosses = new URL("https://api.countapi.xyz/hit/alexlabbane.com/connect4losses");
+			HttpURLConnection con = (HttpURLConnection) aiLosses.openConnection();
+	        
+			con.addRequestProperty("User-Agent", "Mozilla");
+			con.setRequestMethod("GET");
+			
+			int status = con.getResponseCode();
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			
+			String response = in.readLine();
+			numLosses = Integer.parseInt(response.substring(response.indexOf(':') + 1, response.length() - 1));
+			in.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} //AI Wins
+
+		return numLosses;
 	}
 }
