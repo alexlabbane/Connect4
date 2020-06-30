@@ -40,7 +40,7 @@ public class Main {
 			
 			if(selected.toString() == "AI") playerFirst = false;
 			
-			Object difficulty = JOptionPane.showInputDialog(null, "Select AI Difficulty", "Input", 0, null, new Object[] {"1", "2", "3", "4", "5", "6", "7", "8"}, 0);
+			Object difficulty = JOptionPane.showInputDialog(null, "Select AI Difficulty (only difficulty 8 is tracked for wins/losses)", "Input", 0, null, new Object[] {"8", "7", "6", "5", "4", "3", "2", "1"}, 0);
 			
 			int[] weights = new int[] {1, 8, 5, 16, 21, 70};
 			
@@ -55,7 +55,7 @@ public class Main {
 			
 			if(winner == 1) {
 				JOptionPane.showMessageDialog(null, "Blue won the game");
-				if(player1.isHuman()) {
+				if(player1.isHuman() && Integer.parseInt(difficulty.toString()) == 8) {
 					System.out.println("LOSSES: " + addAILoss());
 				} else {
 					System.out.println("WINS: " + addAIWin());
@@ -63,7 +63,7 @@ public class Main {
 					
 			} else if(winner == 2) {
 				JOptionPane.showMessageDialog(null, "Red won the game.");
-				if(player2.isHuman()) {
+				if(player2.isHuman() && Integer.parseInt(difficulty.toString()) == 8) {
 					System.out.println("LOSSES: " + addAILoss());
 				} else {
 					System.out.println("WINS: " + addAIWin());
