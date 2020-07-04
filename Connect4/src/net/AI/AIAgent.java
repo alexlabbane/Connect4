@@ -259,7 +259,7 @@ public class AIAgent {
 						this.parameterWeights[2], 
 						this.parameterWeights[3], 
 						this.parameterWeights[4], 
-						this.parameterWeights[5]), 
+						this.parameterWeights[5]) - tmpBoard.getScore2(color, this.parameterWeights[0], this.parameterWeights[1], this.parameterWeights[2], this.parameterWeights[3], this.parameterWeights[4], this.parameterWeights[5]), 
 						lastCol)); //This is the function to be tuned by the genetic algorithm
 			case 3:
 				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore3(color) - tmpBoard.getScore3(this.opposingColor), lastCol)); 
