@@ -12,13 +12,14 @@ import java.util.Scanner;
 
 import net.connect4Game.Board;
 import net.connect4Game.Piece;
+import net.connect4Game.bitBoard;
 import util.Pair;
 
 public class AIAgent {
 	private int depth;
 	private int color;
 	private int opposingColor;
-	private Board gameBoard;
+	private bitBoard gameBoard;
 	private int type;
 	private TranspositionTable transpositionTable;
 	private int[] moveOrder;
@@ -26,7 +27,7 @@ public class AIAgent {
 	private long nodesEvaluated;
 	private long nodesPruned;
 	
-	public AIAgent(Board gameBoard, int depth, int color, int type) {
+	public AIAgent(bitBoard gameBoard, int depth, int color, int type) {
 		this.depth = depth;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
@@ -35,7 +36,7 @@ public class AIAgent {
 		this.type = type;
 		this.transpositionTable = new TranspositionTable();
 		this.moveOrder = new int[]{3, 1, 4, 2, 5, 0, 6};
-		this.parameterWeights = null;
+		this.parameterWeights = new int[] {0,0,0,0,0,0};
 	}
 	
 	/**
@@ -44,7 +45,7 @@ public class AIAgent {
 	 * @param depth
 	 * @param color
 	 */
-	public AIAgent(Board gameBoard, int depth, int color, int[] parameterWeights) {
+	public AIAgent(bitBoard gameBoard, int depth, int color, int[] parameterWeights) {
 		this.depth = depth;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
@@ -56,7 +57,7 @@ public class AIAgent {
 		this.parameterWeights = parameterWeights;
 	}
 	
-	public void setBoard(Board gameBoard) { this.gameBoard = gameBoard; }
+	public void setBoard(bitBoard gameBoard) { this.gameBoard = gameBoard; }
 	/* Doesn't work yet :/
 	private List<Pair<Integer, Integer>> miniMaxTransposition(boolean maximizingPlayer, int remainingDepth, int alpha, int beta, int lastCol, Board tmpBoard) {
 		//Returns optimal next move based on the results of minimax
@@ -236,37 +237,28 @@ public class AIAgent {
 		return this.nodesPruned;
 	}
 	
-	private List<Pair<Integer, Integer>> miniMax(boolean maximizingPlayer, int remainingDepth, int alpha, int beta, int lastCol, Board tmpBoard) {
+	private List<Pair<Integer, Integer>> miniMax(boolean maximizingPlayer, int remainingDepth, int alpha, int beta, int lastCol, bitBoard tmpBoard) {
 		//Returns optimal next move based on the results of minimax
 		//Scores each gameboard as we go, utilizes backtracking
 		//System.out.println("Call to minimax " + remainingDepth);
-		if(tmpBoard.checkWin() == this.color) {
+		if(tmpBoard.checkWin(this.color) == this.color) {
 			return Arrays.asList(new Pair<Integer, Integer>(remainingDepth * 10000000, lastCol));
 		}
-		if(tmpBoard.checkWin() == this.opposingColor) {
+		if(tmpBoard.checkWin(this.opposingColor) == this.opposingColor) {
 			return Arrays.asList(new Pair<Integer, Integer>(remainingDepth * -10000000, lastCol));
 		}
-		if(tmpBoard.checkWin() == -1 || tmpBoard.moveCount >= 42) {
+		if(tmpBoard.checkWin(this.color) == -1 || tmpBoard.moveCount >= 42) {
 			return Arrays.asList(new Pair<Integer, Integer>(0, lastCol));
 		}
+		
 		if(remainingDepth <= 0) {
-			switch(this.type) {
-			case 1:
-				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore(color) - tmpBoard.getScore(this.opposingColor), lastCol)); 
-			case 2:
-				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore2(color, this.parameterWeights[0],
-						this.parameterWeights[1], 
-						this.parameterWeights[2], 
-						this.parameterWeights[3], 
-						this.parameterWeights[4], 
-						this.parameterWeights[5]) - tmpBoard.getScore2(color, this.parameterWeights[0], this.parameterWeights[1], this.parameterWeights[2], this.parameterWeights[3], this.parameterWeights[4], this.parameterWeights[5]), 
-						lastCol)); //This is the function to be tuned by the genetic algorithm
-			case 3:
-				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore3(color) - tmpBoard.getScore3(this.opposingColor), lastCol)); 
-			case 4:
-				return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore4(color) - tmpBoard.getScore4(this.opposingColor), lastCol)); 
-			}
-			return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore(this.color) - tmpBoard.getScore(this.opposingColor), lastCol)); 
+			return Arrays.asList(new Pair<Integer, Integer>(tmpBoard.getScore(this.color, this.parameterWeights[0],
+				this.parameterWeights[1], 
+				this.parameterWeights[2], 
+				this.parameterWeights[3], 
+				this.parameterWeights[4], 
+				this.parameterWeights[5]) - tmpBoard.getScore(this.opposingColor, this.parameterWeights[0], this.parameterWeights[1], this.parameterWeights[2], this.parameterWeights[3], this.parameterWeights[4], this.parameterWeights[5]), 
+				lastCol)); //This is the function to be tuned by the genetic algorithm
 		}
 		
 		this.nodesEvaluated++;
@@ -286,7 +278,7 @@ public class AIAgent {
 					if(boardScore > maxEval) maxCol = col;
 					maxEval = Integer.max(maxEval, boardScore);
 					alpha = Integer.max(alpha, boardScore);
-					tmpBoard.removePiece(col); //Backtracking
+					tmpBoard.removeLastPiece(); //Backtracking
 
 					if(beta <= alpha) {
 						break;
@@ -316,7 +308,7 @@ public class AIAgent {
 					if(boardScore < minEval) minCol = col;
 					minEval = Integer.min(minEval, boardScore);
 					beta = Integer.min(beta,  boardScore);
-					tmpBoard.removePiece(col); //Backtracking
+					tmpBoard.removeLastPiece(); //Backtracking
 
 					if(beta <= alpha) {
 						break;
@@ -333,6 +325,8 @@ public class AIAgent {
 	}
 
 	public int getBookMove(BufferedReader boardReader) throws IOException {
+		//TODO: Fix Book Moves
+		/*
 		for(int i = 0; i < 6; i++) { //row
 			String[] row = boardReader.readLine().split(" ");
 			for(int j = 0; j < 7; j++) { //col
@@ -351,13 +345,14 @@ public class AIAgent {
 					return j;
 				}
 			}
-		}
+		}*/
 		
 		return -1; //No book move found
 	}
 	
 	public boolean playMove() {
-		String oppMoves = this.gameBoard.getMoveSequence(this.opposingColor);
+		//TODO: Fix Book Moves
+		/*String oppMoves = this.gameBoard.getMoveSequence(this.opposingColor);
 		if(this.gameBoard.getMoveSequence(this.color).length() < 4) {
 			//Search for predefined move
 			String dataPath = "./openingBook/" + this.color;
@@ -374,7 +369,7 @@ public class AIAgent {
 			} catch (IOException e) {
 				System.out.println("Expected Book Move not found at: " + dataPath);
 			}
-		}
+		}*/
 		
 		//Use iterative deepening w/transposition table to improve move ordering and performance for previously seen board states
 		//Board newBoard = new Board(this.gameBoard);
@@ -396,7 +391,7 @@ public class AIAgent {
 		//Scanner wait = new Scanner(System.in);
 		//int t = wait.nextInt();
 		
-		/*System.out.println("Move Preferences");
+		System.out.println("Move Preferences");
 		for(Pair<Integer, Integer> p : nextMoves) {
 			System.out.print(p.first + "\t");
 		}
@@ -407,7 +402,7 @@ public class AIAgent {
 		System.out.println();
 		
 		System.out.println("Minimax Score: " + nextMoves.get(0).first);
-		System.out.println("AI plays in row " + nextMoves.get(0).second);*/
+		System.out.println("AI plays in row " + nextMoves.get(0).second);
 		return gameBoard.executeMove(this.color, nextMoves.get(0).second);
 	}
 	

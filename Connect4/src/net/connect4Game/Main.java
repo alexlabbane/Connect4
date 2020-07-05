@@ -23,8 +23,8 @@ import net.train.GA;
 public class Main {
 	public static void main(String args[]) throws InterruptedException, IOException {
 		
-		testBitBoard();
-		System.exit(0);
+		//testBitBoard();
+		//System.exit(0);
 		
 		//Launcher launcher = new Launcher();
 		boolean playAgain = true;
@@ -39,7 +39,7 @@ public class Main {
 			
 			if(selected.toString() == "AI") playerFirst = false;
 			
-			Object difficulty = JOptionPane.showInputDialog(null, "Select AI Difficulty (only difficulty 8 is tracked for wins/losses)", "Input", 0, null, new Object[] {"9", "8", "7", "6", "5", "4", "3", "2", "1"}, 0);
+			Object difficulty = JOptionPane.showInputDialog(null, "Select AI Difficulty (only difficulty 8 is tracked for wins/losses)", "Input", 0, null, new Object[] {"11", "9", "8", "7", "6", "5", "4", "3", "2", "1"}, 0);
 			
 			int[] weights = new int[] {1, 8, 5, 16, 21, 70};
 			
@@ -85,7 +85,7 @@ public class Main {
 	}
 	
 	public static void test() {
-		Board board = new Board();
+		bitBoard board = new bitBoard();
 		AIAgent blue = new AIAgent(board, 8, 1, Game.AITypes.MINIMAX.getType());
 		try {
 			int move = blue.getBookMove(new BufferedReader(new FileReader("C:/Users/scien/Desktop/Connect Four V2/ConnectFourData/AIFirst/board.txt")));
@@ -149,21 +149,15 @@ public class Main {
 	
 	public static void testBitBoard() {
 		bitBoard test = new bitBoard();
-		test.executeMove(1, 0);
-
-		test.executeMove(1, 2);
-		test.executeMove(1, 2);
-		test.executeMove(1, 2);
-		test.executeMove(1, 3);
-		test.executeMove(1, 3);
+		test.executeMove(2, 0);
+		//test.executeMove(1, 1);
+		//test.executeMove(1, 2);
 		test.executeMove(1, 3);
 		test.executeMove(1, 4);
-		test.executeMove(1, 4);
-		test.executeMove(1, 4);
+		//test.executeMove(1, 4);
+		//test.executeMove(1, 1);
+		//test.executeMove(1, 1);
 
-
-		System.out.println(test);
-
-		System.out.println(test.countThreeSeq(1));
+		System.out.println(test.countThreeSeq(1)[0] + " " + test.countThreeSeq(1)[1]);
 	}
 }

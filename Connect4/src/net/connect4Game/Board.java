@@ -312,12 +312,7 @@ public class Board {
 		
 		return score;
 	}
-	
-	public int getScore4(int color) {
-		RandomAIAgent rai = new RandomAIAgent(color, this, 10);
-		
-		return rai.getScore();
-	}
+
 	
 	public int getScore3(int color) {
 		//TODO: Produce better evaluation function

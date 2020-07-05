@@ -20,12 +20,12 @@ public class GUI {
 	private ArrayList<JButton> inputs;
 	private JLabel aiInfo;
 	
-	private Board gameBoard;
+	private bitBoard gameBoard;
 	
 	private int currentColor;
 	private boolean enabled;
 	
-	public GUI(Board gameBoard) {
+	public GUI(bitBoard gameBoard) {
 		window = new JFrame("Connect4");
 		this.gamePanel = new JPanel();
 		this.gamePanel.setLayout(null);
@@ -77,14 +77,13 @@ public class GUI {
 		
 	}
 	
-	public void updateValidInputs(Board gameBoard) {
+	public void updateValidInputs(bitBoard gameBoard) {
 		for(int i = 0; i < inputs.size(); i++) {
-			boolean full = true;
-			for(Piece p : gameBoard.getBoard().get(i)) {
-				if(p.getColor() == 0) full = false;
-			}
-			
-			if(full) inputs.get(i).setVisible(false);
+			boolean empty = false;
+			if(gameBoard.canPlay(i))
+				empty = true;
+				
+			inputs.get(i).setVisible(empty);
 		}
 	}
 	
@@ -96,9 +95,19 @@ public class GUI {
 		return this.enabled;
 	}
 	
-	public void updateGUI(int row, int col, int color) {
-		int index = row * 7 + col;
+	public void updateGUI(int col, int color) {
+		int index = -1;
+		for(int i = 5; i >= 0; i--) {
+			if(boardButtons.get(7 * i + col).getBackground() != Color.BLUE
+					&& boardButtons.get(7 * i + col).getBackground() != Color.RED) {
+				index = 7 * i + col;
+				break;
+			}
+		}
 				
+		if(index == -1)
+			return;
+		
 		if(color == 1) {
 			boardButtons.get(index).setBackground(Color.BLUE);
 			this.currentColor = 2;

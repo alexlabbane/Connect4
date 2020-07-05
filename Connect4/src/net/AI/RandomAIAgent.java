@@ -3,16 +3,17 @@ package net.AI;
 import java.util.Random;
 
 import net.connect4Game.Board;
+import net.connect4Game.bitBoard;
 
 public class RandomAIAgent {
 	
-	private Board gameBoard;
+	private bitBoard gameBoard;
 	private Random moveGenerator;
 	private int color;
 	private int opponentColor;
 	private int numIterations;
 	
-	public RandomAIAgent(int color, Board gameBoard, int numIterations) {
+	public RandomAIAgent(int color, bitBoard gameBoard, int numIterations) {
 		this.gameBoard = gameBoard;
 		this.color = color;
 		this.moveGenerator = new Random();
@@ -38,7 +39,7 @@ public class RandomAIAgent {
 		boolean AITurn = false;
 		
 		if(this.gameBoard.executeMove(this.color, firstMove)) {
-			while(this.gameBoard.checkWin() == 0) {
+			while(this.gameBoard.checkWin(this.color) == 0) {
 				if(AITurn) {
 					if(this.gameBoard.executeMove(this.color, nextMove)) {
 						movesMade++;
@@ -55,12 +56,12 @@ public class RandomAIAgent {
 			}
 			
 			int val = 0;
-			if(this.gameBoard.checkWin() == this.opponentColor) val = (42 - movesMade); //Loss
-			else if(this.gameBoard.checkWin() != this.color) val = 0; //Draw
+			if(this.gameBoard.checkWin(this.color) == this.opponentColor) val = (42 - movesMade); //Loss
+			else if(this.gameBoard.checkWin(this.color) != this.color) val = 0; //Draw
 			else val = 0; //Win
 			
 			while(movesMade > 0) {
-				this.gameBoard.removePiece(this.gameBoard.getLastCol());
+				this.gameBoard.removeLastPiece();
 				movesMade--;
 			}
 			

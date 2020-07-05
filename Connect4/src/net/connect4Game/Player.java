@@ -19,9 +19,9 @@ public class Player {
 	private int AIType;
 	private int[] parameterWeights; //Used for genetic algorithm AI
 	
-	private Board gameBoard;
+	private bitBoard gameBoard;
 	
-	public Player(boolean human, int color, GUI gui, Board board, int AIType, int tmpType, int depth) {
+	public Player(boolean human, int color, GUI gui, bitBoard board, int AIType, int tmpType, int depth) {
 		this.isHuman = human;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
@@ -39,7 +39,7 @@ public class Player {
 		this.parameterWeights = null;
 	}
 	
-	public Player(boolean human, int color, GUI gui, Board board, int AIType, int[] parameterWeights, int depth) {
+	public Player(boolean human, int color, GUI gui, bitBoard board, int AIType, int[] parameterWeights, int depth) {
 		this.isHuman = human;
 		this.color = color;
 		if(this.color == 1) this.opposingColor = 2;
@@ -60,11 +60,13 @@ public class Player {
 	
 	public void setGUI(GUI gui) { this.gui = gui; }
 	
-	public void setBoard(Board gameBoard) { this.gameBoard = gameBoard; this.ai.setBoard(gameBoard); }
+	public void setBoard(bitBoard gameBoard) { this.gameBoard = gameBoard; this.ai.setBoard(gameBoard); }
 	
 	public boolean isHuman() { return this.isHuman; }
 	
-	public boolean play(Board gameBoard) {
+	public int getColor() { return this.color; }
+	
+	public boolean play(bitBoard gameBoard) {
 		if(this.isHuman) {
 			//Listen for inputs from player
 			while(gui.inputIsEnabled()) {
@@ -73,7 +75,6 @@ public class Player {
 					Thread.sleep(50); 
 				} catch (InterruptedException e) { e.printStackTrace(); }
 			}
-			System.out.println("Players Score: " + (gameBoard.getScore(this.color) - gameBoard.getScore(this.opposingColor)));
 			return true;
 		} else {
 			//System.out.println("The AI is thinking.");
